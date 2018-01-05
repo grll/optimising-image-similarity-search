@@ -1,0 +1,290 @@
+\documentclass[a4paper]{article}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{float}
+\usepackage{caption} \captionsetup[table]{skip=5pt}
+
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{subcaption}
+
+\begin{document}
+
+\title{\textbf{\huge Optimising similarity search between images}\  \\  \textit{Semester Project}\vspace{3 cm}}
+
+\author{Author:\\ Guillaume RAILLE \vspace{1 cm}\\ Supervisors: \\ Prof. Karl ABERER \\ Rémi LEBRET \\ Hamza HARKOUS  \vspace{3 cm}}
+
+
+
+\date{Winter 2017}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{epfl}
+\end{figure}
+\renewcommand{\headrulewidth}{1pt}
+\fancyhead[L]{Semester Project}
+\fancyhead[R]{Optimising Similarity Search}
+
+\maketitle
+\pagestyle{fancy}
+
+\newpage
+\section*{Introduction}
+	\subsection*{Purpose of this project}
+	This project takes an experimental approach to implement, assess and compare different solutions to efficiently detect similarities between images. It is based on several state-of-the-art techniques and methodology that are still actively growing and being developed today such as Convolutional Neural Network and transfer learning. The way to address the issue of detecting similarities between images at large scale was largely influenced by this paper \cite{large-scale-search}. It can be considered as a solid starting point for this project as it helped us define an efficient pipeline and evaluation methodology.
+	
+	\subsection*{Some definitions}
+		\subsubsection*{Convolutional Neural Network (CNN)}
+		
+		As we introduced just above, Convolutional Neural Network are at the essence of this project and understanding the idea behind it was also part of the project. In our case we consider a Convolutional Neural Network that takes as input an image, perform multiples operation and convolution on it and gives as output a fully connected layer (FC) that is just a one dimension vector with each value of this vector being a weight that represent the vote of a given image to be part of a given class. The different values of the masks (in the the convolutional layers) and the voting weights are learn through back propagation (gradient descent). There are nowadays many implementations of CNN. In this project, we focused on a CNN called ResNet which was developed at microsoft for the COCO 2015 competition \cite{resnet}. ResNet stands for Residual network, they were the first to introduce shortcut connections between layers to improve the performance of their CNN. More specifically we used throughout the project their 18-layers ResNet implementation.
+		
+		\subsubsection*{Transfer learning}
+		
+		The problem with CNN is that before it is trained and its voting weights and values are learned from the data, it is absolutely useless. Unfortunately, before becoming very performant, CNN usually needs to be trained on a lot of data and it takes a very long time. Transfer learning solves this problem by using a pre-trained CNN (on an unrelated dataset) to solve our specific classification problem. There is basically two ways to perform transfer learning: Finetuning or Fixed Feature extractor. The first one consist in using pretrained weights instead of random initialisation, the second one consist in fixing the weights for all the network except the Fully Connected layer. The latter is much faster and our project pipeline is based on this concept.
+
+		\subsubsection*{Hardware and Setup}
+		The aim of best efficiency to perform large scale similarity between image detection is obviously highly dependent on the hardware used to perform the search in the first place. In our case, we had the opportunity to compare on a server the difference between method using GPU and CPU. During the project we used a Nvidia Titan X to perform the computation on GPU, and an Intel(R) Xeon(R) CPU E5-2620 v3 with 24 cores for computation on CPU. To easily handle GPU computation and switch between CPU/GPU memory, we used the open-source Pytorch library.
+		
+\section{Pipeline}
+
+To evaluate efficiently the different method to detect similarities, we followed a pipeline similar for each method tested. As previously mentioned, this pipeline is highly inspired from this paper \cite{large-scale-search}. This pipeline is composed of three steps before assessment or evaluation of the results. First we perform a Feature extraction on each image using a pretrained CNN, then we perform a PCA dimensionality reduction to improve the speed and performance of the computations, finally we apply the k-NN (nearest neighbour) method we want to test on the PCA reduced extracted features.
+
+
+\subsection{Feature Extraction}
+
+The Feature Extraction step of our pipeline is very similar to what we described in transfer learning (Fixed Feature extractor). Here as well we used a pretrained CNN (ResNet-18) trained on ImageNet and Places365 (see more in Datasets section) and we fixed their weights. Then we extracted for each images the "features" corresponding to the output of the last convolution layer (just before the fully connected layer). In this specific case we ended up with a one vector with 512D for each images in our dataset. The output of last Layer of our CNN represent the high-level features from our convolutional neural network and describe each corresponding image with this 512 values. We could use this "description" of the images as is and perform directly the third step to find the most similar images inside our dataset but to optimise the process we decided to use PCA following the pipeline from the paper \cite{large-scale-search}.  
+
+\subsection{Dimensionality Reduction (PCA)}
+
+How we realise PCA to reduce the number of feature through SVD.
+Led to two datasets that we used through this project (Raw features and PCA features)
+The extracted features from each images aggregated in a matrix, we obtained from the first step a (\# of images x 512) dimension matrix. Reducing the dimension using PCA in this case from 512 to 128 helped us to get a great increase in computation time while keeping a good accuracy (see results). To perform PCA on GPU we used the SVD pyTorch function which perform the SVD decomposition. From the SVD decomposition we could compute the dimension reduced matrix (with Û*S) equivalent to the PCA reduction. This dimensionality reduction led to the use of 2 datasets throughout the project:
+\begin{itemize}
+	\item raw features (corresponding to the raw 512D vector extracted for each image)
+	\item PCA features (corresponding to the 128D PCA reduced vector for each image).
+\end{itemize}
+
+\subsection{k-NN methods}
+
+The last step of our pipeline was to actually compute similarities between images using the features previously extracted. To do so we used different k-NN methods and we evaluated their performance. We tried some on GPU other on CPU and we even compared with our on implementation of k-NN.
+
+\subsubsection{Bruteforce}
+
+What we call in this project simply "Bruteforce" was our own implementation of a k-NN Bruteforce method. It is a very simple method that simply check all possible neighbour and return the closest one. We made it run on GPU using two already optimised function from PyTorch: "topk" to find the k closest neighbour and "norm" to compute the distance between features vector. We mostly used this approach to produce a "k-NN ground truth" that can be use to compare other approximate method performance. It is also useful to check their computation time performance against this simple bruteforce method.
+
+\subsubsection{Annoy}
+
+	Annoy\footnote{\url{https://github.com/spotify/annoy}} is an approximate Nearest Neighbors library developed in C++ and optimised for memory usage and loading/saving to disk. It was built by Erik Bernhardsson at Spotify during Hack Week and is still currently being used by Spotify. It supports a full Python API that we will be using in this project. The main advantage of this library (beside the fact that it is fast and it is optimised to reduce footprint memory), is that it has the ability to use static files as indexes to compute k-NN. In particular, it makes it possible to pass around indexes as files and map them into memory quickly. Annoy was only developed for CPU and as such we will only use it on our CPU. It is also worth noting that Annoy is an approximate method and we will need to compare it with an exact method (bruteforce) to assess its performance. \\
+	
+	On a more practical point of view, Annoy uses Random Projection to build up a tree. At every intermediate node in the tree, it divides the space into 2 subspaces using a random hyperplane (hyperplane chosen by sampling two points from the subset and taking the hyperplane equidistant from them). Doing this operation multiple times will generate of forest of trees which represent the index previously mentioned. As such Annoy let us play with 2 parameters:
+	
+	\begin{itemize}
+		\item \textit{n\_trees}: the number of tree we are willing to build. More \textit{n\_trees} implies more build time and more memory usage but also more precision.
+		\item \textit{search\_k}: the number of node to inspect when searching for nearest neighbour in the trees. Higher \textit{search\_k} leads to higher precision but increase the search computation time as well.
+	\end{itemize}
+
+\subsubsection{NMSLIB}
+
+NMSLIB\footnote{\url{https://github.com/searchivarius/nmslib}} or Non-Metric Space Library (NMSLIB) is an efficient cross-platform similarity search library and a toolkit for evaluation of similarity search methods. It allows searching in generic metric and non-metric spaces. In our case we only focus on the euclidian space. Indeed we use a l2 norm to find similarity between extracted features. This is a good news as NMSLIB claims to have very good performance in the Euclidian domain as well. NMLSIB has been developed and optimised in C++ and also provide a Python API that we use in this project. The library propose many different similarity search methods with different performance in this project we will focus on one of the most promising one they provide: Hierarchical Navigable Small World graphs (also known as HNSW \cite{HNSW}). This approximate approach is fully graph-based, without any need for additional search structures and is able to strongly outperform many previous state-of-the-art vector-only approaches. NMSLIB has been written for CPU and as such we will make or computation on the CPU we have at hand when using HNSW the only parameter we will be able to tune will be the number of worker (number of threads used by the CPU).
+
+\subsubsection{Faiss}
+\begin{itemize}
+	\item What is Faiss? \vspace{5pt} \\
+	Faiss\footnote{\url{https://github.com/facebookresearch/faiss}} is a library that was originally developed at Facebook AI research. The library was at the beginning a project that led to a published paper \cite{faiss}. At its essence, the project focused on similarity search at "billion scale" by optimizing GPU usage. The library that came out of it (faiss) is by nature optimize for GPU and propose an efficient design for brute-force, approximate and compressed-domain search based on product quantization (Voronoi cells).
+	\item How did we use Faiss? \vspace{5pt} \\
+	On a more practical point of view the Faiss library is also very efficient to perform similarity search on CPU, but we focused in this project on the GPU performance of it as it is where the library shine. We applied the usual pipeline on Faiss, the only singularity here was that the library offered much more possibilities compared to all the previous one. In order to properly assess the performance of Faiss approximate method, we made several benchmarks playing around with the parameters (mostly nlist representing the number of voronoi cell to split our data on, and nprobe the number out of nlist to check when performing the search). We first did our experiment on a k-NN search with k=2 to get the vector itself and its nearest neighbour then we repeated our analysis with k=6 to get the 5 closest neighbours.
+\end{itemize}
+
+
+\section{Experimental Setup}
+
+Now that we set in the previous part a Pipeline to study and evaluate our different approach to image similarity detection. We will describe here what we use in practice in our experimental approach to the problem.
+
+\subsection{Datasets}
+All in all, we used three different dataset in this project for two main purpose: two dataset for feature extraction and one dataset to evaluate the performance of our methods.
+
+\subsubsection{ImageNet and Places365 for feature extraction}
+As described in the introduction (c.f. transfer learning) and in the feature extraction of the Pipeline part (c.f. 1.1), it is wise to extract the features directly from a pretrained network. After choosing the CNN we were going to use (ResNet-18) we had several choices regarding on which data it was going to be trained. We chose in this project to study and see the resulting difference between two training datasets:
+\begin{itemize}
+	\item \textbf{ImageNet\footnote{\url{http://www.image-net.org}}}: ImageNet is a very wide library of labeled images (almost 14.2 millions images) organized according to the WordNet hierarchy (tree of words) in which each nodes represent an average of 500 words. ImageNet is very famous for the challenge they propose (LSVRC) from which many image classification solution and in particular CNN where developed such as the ResNet used during this project. It's important to note that most images from this library are precisely zoomed at one or a few particular object corresponding to the word they are stored at. (see Figure \ref{fig:imagenet-img} for an example)
+	\item \textbf{Places365\footnote{\url{http://places2.csail.mit.edu}}}: Places365 is a dataset composed of 1.6 million train images from  365 scene categories. The images are labeled and represented by meta attribute in this case mostly attributes as well as a scene category. In this dataset, the pictures represent each time a whole scene (see Figure \ref{fig:places-img}) and not a precise object as in ImageNet. We will see the influence of it in the last part of this project where we compare the performance of our Pipeline on different subgroup of images.
+\end{itemize}
+
+Using transfer learning and pretrained CNN has some advantages and inconvenient that we will mostly see in the last part of this project (Images subgroup analysis). Most of the results obtained in this project and unless specified otherwise will result from features extracted from the ResNet-18 pretrained on the ImageNet dataset.
+
+
+\subsubsection{MSCoCo for evaluation}
+
+To test the different method and get meaningful results we needed a third independent dataset. This dataset had to be wide as we were willing to perform our evaluation at large scale. This is the reason why we used the COCO\footnote{\url{http://cocodataset.org}} dataset for evaluation. COCO is a large dataset of more than 330'000 images humanly labeled with caption. The images present in this dataset are again more representing a scene rather than a specific object as we can see on Figure \ref{fig:coco-img}. All the results we obtained are coming from the training set 2017 of the COCO challenge which is composed of roughly 118'000 images with 5 humanly made caption each. Another good aspect of using COCO is that it provide an integration with Pytorch and makes it easy to load the images and their corresponding captions through the COCO API.
+
+
+\begin{figure}
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth, height=3cm]{imagenet-img}
+    \caption{ImageNet image}
+    \label{fig:imagenet-img}
+  \end{subfigure}
+  %
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth, height=3cm]{places-img}
+    \caption{Places365 image}
+    \label{fig:places-img}
+  \end{subfigure}
+  %
+  \begin{subfigure}[b]{0.32\textwidth}
+    \includegraphics[width=\textwidth, height=3cm]{coco-img}
+    \caption{COCO image}
+    \label{fig:coco-img}
+  \end{subfigure}
+\end{figure}
+
+\subsection{Evaluation Technique and Metrics}
+
+After performing the different operation of our pipeline on the datasets, we wanted to evaluate the performance of the different k-NN method and library tried during the process. To do so a measure we constantly used during the evaluation phase was the computation time in second. If the method used some kind of indexing we also computed separately the time of building the index, the time of searching on the index, and the total time. As we are using a several approximate method, it is also interesting to look a the performance of the result for that we use two strategies described below: Similarity in result with the ground truth (brute-force search), and Bleu score. 
+
+	\subsubsection{Compare similarity with brute-force}
+		2 kinds of similarity (strict and permissive)
+		To compare the similarity between two results from different library we computed their similarity with our basic brute-force results. It is important to note that since the brute-force also use approximation to compute their neighbours (floating point approximation) some small difference might be noticed (some method compute not in the same order and might swap the first and second neighbour if their distance is lower than epsilon for example) so we cant expect 100\% similarity score even between two different implementations of a brute-force search. That being said this is a good estimator at how the method performed. We used in this project two kinds of similarity score:
+		\begin{itemize}
+			\item Strict Similarity: given several neighbours for a given image this score represent the number of identical value compared to the ground truth (respecting the orders) divided by the number of neighbours. The result is often the average of this score on every images of the dataset.
+			\item Permissive Similarity: this is the same as the strict similiraty except that this method doesn't look at the position of the neighbour it just takes the intersection between the brute-force result and the currently being evaluated result for a given image and divide it by the number of neighbours.
+		\end{itemize}
+		These two metrics allows us to grasp a good idea about the performance of the method. However what if the brute-force method is already wrong from the beginning ? that is why we introduced the Bleu Score.
+	\subsubsection{Bleu Score}
+		Bleu or Bilingual Evaluation Understudy is an algorithm to compare a given candidate text with a certain number of reference text. In order to so it uses a combinaison of n-gram. It mainly allowed us to have a metrics that was independent from any k-NN search but more related to the captions and human label linked with the images. As we had five captions for each images we first used it by taking one by one each five captions of the original image as candidate and compared it with the five captions of the neighbours image as references. This approach provided very similar results between each method so we then used the first five neighbours captions as reference and the original caption as candidate to compute the BLEU score.
+		
+\section{Results}
+	\subsection{Bruteforce}
+	\subsection{Annoy}
+	\subsection{NMSLIB}
+	\subsection{Faiss}
+
+\subsubsection{Bruteforce with Faiss}
+
+To assess the performance of the bruteforce k-NN search with Faiss, we computed the average time used by the method to build the index of the whole 118'000 images dataset as well as the time needed to perform the search (search the whole dataset over the index). We performed this computation on both the RAW features dataset and the PCA reduced one. In the two cases we used a number of neighbours to find k=2 and then k=6. We averaged our results over 10 iterations to make it more consistent. We obtained the following results:
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ c | c | c | c | c |}
+		\cline{2-5}
+		& Dataset & Building Index & Performing the search & Total \\ \cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{2}{*}{k=2} } & RAW & 0.030 s & 1.746 s & 1.776 s \\ \cline{2-5}
+		\multicolumn{1}{ |c|  }{} & PCA & 0.013 s & 0.633 s & 0.646 s \\ \cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{2}{*}{k=6} } & RAW & 0.067 s & 1.763 s & 1.830 s\\ \cline{2-5}
+		\multicolumn{1}{ |c|  }{} & PCA & 0.014 s & 0.616 s & 0.630 s \\ \cline{1-5}
+	\end{tabular}
+	\caption{Benchmark results of Faiss Bruteforce.}
+	\label{table:benchmark-faiss-bruteforce}
+\end{table}
+
+In this case, we observe for both dataset that the dominant factor is the search time or in other word the time to perform the query on each row of the dataset. We also observe that using the PCA reduced dataset lowered the time to compute by a factor of almost 3 (when we reduced the dimensionality from 512 to 128). It is also interesting to note that we don't observe significant increase in time when computing two or six nearest neighbours. Now to be able to say if the PCA reduced search was accurate enough it is interesting to compare the similarity between the matched neighbours with and without PCA reduction.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ | c | c | c |}
+	\hline
+		Exact Similarity k = [1] & Exact Similarity k = [1:] & Permissive Similarity k = [0:] \\ \hline
+		69.14 \% & 15.74 \% & 74.65 \% \\ \hline
+		
+	\end{tabular}
+	\caption{Similarity between RAW and PCA dataset using Faiss Bruteforce.}
+	\label{table:sim-faiss-bruteforce}
+\end{table}
+
+On Table \ref{table:sim-faiss-bruteforce}, we observe the similarity using the usual similarity functions defined previously. The first column represent the similarity between each second neighbour (first neighbour if we exclude self), the second represent the first five neighbours and the last column represent all the six first neighbours including self. We can observe a quiet low strict similarity result on the five first neighbour however we clearly see through the Permissive Similarity score that most of the top five neighbours are the same (almost 75 \% in this case) so we can be confident that our PCA score while being three time faster to compute is still pretty accurate. We can even confirm these results visually on Figure \ref{fig:visual-faiss}.
+
+\begin{figure}[h]
+	\includegraphics[width=\textwidth]{visual-faiss}
+	\caption{First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.}
+	\label{fig:visual-faiss}
+\end{figure}
+
+On Figure \ref{fig:visual-faiss}, we see that while some bruteforce PCA images are not identical to their raw bruteforce counterpart, they still have some similarities with the original picture. 
+
+\subsubsection{Approximate Search}
+
+Next still using the Faiss library, we performed again on the full dataset their approximate method using product quantization. We used several benchmark to precisely assess the performance of this method as well as its computation time. We successively increased the different parameters (namely nlist and nprobe) to identify their impact on computation time and performance as described in the Pipeline section.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ | c | c | c | c | c | c | c | c | c | c |}
+		\cline{1-9}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{nprobe} } & \multicolumn{8}{ |c|  }{nlist} \\ \cline{2-9}
+		\multicolumn{1}{ |c|  }{} & \multicolumn{2}{ |c|  }{1024} & \multicolumn{2}{ |c|  }{2048} & \multicolumn{2}{ |c|  }{4096} & \multicolumn{2}{ |c|  }{8192} \\ \cline{2-9}
+		\multicolumn{1}{ |c|  }{} & Search & Total & Search & Total & Search & Total & Search & Total \\ \cline{1-9}
+		1 & 0.08 s & 0.77 s & 0.07 s & 0.58 s & 0.07 s & 0.68 s & 0.08 s & 1.09 s \\
+		2 & 0.09 s & 0.77 s & 0.08 s & 0.59 s & 0.08 s & 0.70 s & 0.09 s & 1.10 s \\
+		4 & 0.12 s & 0.80 s & 0.09 s & 0.60 s & 0.10 s & 0.71 s & 0.10 s & 1.11 s \\
+		8 & 0.17 s & 0.86 s & 0.12 s & 0.63 s & 0.11 s & 0.73 s & 0.11 s & 1.12 s \\
+		16 & 0.29 s & 0.97 s & 0.18 s & 0.69 s & 0.14 s & 0.76 s & 0.13 s & 1.14 s \\
+		32 & 0.55 s & 1.23 s & 0.31 s & 0.81 s & 0.20 s & 0.82 s & 0.18 s & 1.19 s \\
+		64 & 1.12 s & 1.81 s & 0.57 s & 1.08 s & 0.35 s & 0.97 s & 0.26 s & 1.27 s \\
+		\cline{1-9}
+	\end{tabular}
+	\caption{Computation time of Faiss approximate method on the PCA features with k=6. (Search represent the search time (query time) and Total the sum of the search time and index building time.}
+	\label{table:computation-time-faiss}
+\end{table}
+
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ | c | c | c | c | c | c | c | c | c | c |}
+		\cline{1-9}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{nprobe} } & \multicolumn{8}{ |c|  }{nlist} \\ \cline{2-9}
+		\multicolumn{1}{ |c|  }{} & \multicolumn{2}{ |c|  }{1024} & \multicolumn{2}{ |c|  }{2048} & \multicolumn{2}{ |c|  }{4096} & \multicolumn{2}{ |c|  }{8192} \\ \cline{2-9}
+		\multicolumn{1}{ |c|  }{} & S.S. & P.S. & S.S. & P.S. & S.S. & P.S. & S.S. & P.S. \\ \cline{1-9}
+		1 & 4.47\% & 37.56\% & 3.53\% & 33.52\% & 2.45\% & 29.48\% & 1.74\% & 26.46\% \\
+		2 & 8.08\% & 50.94\% & 6.52\% & 46.46\% & 5.23\% & 42.24\% & 4.18\% & 38.96\% \\
+		4 & 11.37\% & 61.61\% & 9.95\% & 57.72\% & 8.63\% & 53.94\% & 7.63\% & 50.85\% \\
+		8 & 13.76\% & 68.41\% & 12.89\% & 65.79\% & 11.83\% & 62.98\% & 10.86\% & 60.46\% \\
+		16 & 14.96\% & 72.05\% & 14.46\% & 70.54\% & 13.92\% & 68.91\% & 13.32\% & 67.23\% \\
+		32 & 15.51\% & 73.80\% & 15.25\% & 73.05\% & 15.00\% & 72.20\% & 14.65\% & 71.26\% \\
+		64 & 15.68\% & 74.42\% & 15.53\% & 74.12\% & 15.49\% & 73.75\% & 15.36\% & 73.30\% \\ \cline{1-9}
+	\end{tabular}
+	\caption{Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared raw features bruteforce search).}
+	\label{table:benchmark-faiss}
+\end{table}
+
+On Table \ref{table:computation-time-faiss} and \ref{table:benchmark-faiss}, there is a few interesting things we can observe. First we see that there is no case in which the total time is less than 0.63 seconds (the time necessary to perform the bruteforce search). This result might appear as a deception, but it can be explained by the fact that building the index to perform the search takes significantly more time when using the approximate method. By looking further at the results we observe that eventhough the overall time is larger, performing only a search is several order of magnitude smaller (depending on the parameters) which could be really interesting for application that needs to query several time on the same indexed dataset. When changing the different parameters, we notice quiet obviously that increasing the number of nprobe (number of veronoi cells to check out of nlist) leads to an increase in search time and an improved similiraty score. Similarly increasing the number of cells (nlist) reduce the search time for a given nprobe (the search span is smaller) however it increases the index building time. \\
+
+To conclude on Faiss results, we observed that it is always a tradeoff between fast build time, fast search time and precision. When performing a single search an a whole dataset only once we would recommend using the bruteforce search which is overall faster and more accurate. However when performing several search on the same dataset it could be interesting to consider a fine tuned approximate search.
+
+\subsection{Discussion on the results}
+	which method for which use case depending on the results, CPU method vs GPU method, training vs search...
+
+\section{Images subgroup analysis}
+	Why we do that? What difference between places365 and Imagenet. How did we proceed ? Which subgroup did we chose.
+	
+	\subsection{Results with places365}
+	\subsection{Results with Imagenet}
+	\subsection{Conclusion}
+	
+	which training set for our CNN for which kind of images.
+
+\begin{thebibliography}{5}
+\bibitem{large-scale-search} 
+Matthijs Douze, Hervé Jégou and Jeff Johnson. 2017.
+\textit{An evaluation of large-scale methods for image instance and class discovery}.
+
+\bibitem{resnet} 
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun. 2015.
+\textit{Deep Residual Learning for Image Recognition}.
+
+\bibitem{HNSW} 
+Yu. A. Malkov, D. A. Yashunin. 2017.
+\textit{Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs}.
+
+\bibitem{faiss} 
+Jeff Johnson, Matthijs Douze, and Hervé Jégou. 2017.
+\textit{Billion-scale similarity search with GPUs}. 
+\end{thebibliography}
+
+\end{document}
