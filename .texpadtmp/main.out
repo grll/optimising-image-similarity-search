@@ -14,7 +14,7 @@
 \BOOKMARK [3][-]{subsubsection.2.2.1}{Compare similarity with brute-force}{subsection.2.2}% 14
 \BOOKMARK [3][-]{subsubsection.2.2.2}{Bleu Score}{subsection.2.2}% 15
 \BOOKMARK [1][-]{section.3}{Results}{}% 16
-\BOOKMARK [2][-]{subsection.3.1}{Bruteforce}{section.3}% 17
+\BOOKMARK [2][-]{subsection.3.1}{Brute-force}{section.3}% 17
 \BOOKMARK [2][-]{subsection.3.2}{Annoy}{section.3}% 18
 \BOOKMARK [2][-]{subsection.3.3}{NMSLIB}{section.3}% 19
 \BOOKMARK [2][-]{subsection.3.4}{Faiss}{section.3}% 20

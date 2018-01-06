@@ -157,13 +157,100 @@ After performing the different operation of our pipeline on the datasets, we wan
 			\item Strict Similarity: given several neighbours for a given image this score represent the number of identical value compared to the ground truth (respecting the orders) divided by the number of neighbours. The result is often the average of this score on every images of the dataset.
 			\item Permissive Similarity: this is the same as the strict similiraty except that this method doesn't look at the position of the neighbour it just takes the intersection between the brute-force result and the currently being evaluated result for a given image and divide it by the number of neighbours.
 		\end{itemize}
-		These two metrics allows us to grasp a good idea about the performance of the method. However what if the brute-force method is already wrong from the beginning ? that is why we introduced the Bleu Score.
+		These two metrics allows us to grasp a good idea about the performance of the method. However the brute-force results aren't absolute ground truth as well and neighbours that are not considered by a brute-force method might be still valid when looking at the two picture. This is the reason why why we introduced the BLEU Score.
 	\subsubsection{Bleu Score}
-		Bleu or Bilingual Evaluation Understudy is an algorithm to compare a given candidate text with a certain number of reference text. In order to so it uses a combinaison of n-gram. It mainly allowed us to have a metrics that was independent from any k-NN search but more related to the captions and human label linked with the images. As we had five captions for each images we first used it by taking one by one each five captions of the original image as candidate and compared it with the five captions of the neighbours image as references. This approach provided very similar results between each method so we then used the first five neighbours captions as reference and the original caption as candidate to compute the BLEU score.
+		BLEU or Bilingual Evaluation Understudy (paper \cite{BLEU}) is an algorithm to compare a given candidate text with a certain number of reference text. In order to so it uses a combinaison of n-gram. The best possible value for this score is 1 if all the sentences are identical. It goes down to 0 if there is nothing in common between the candidate sentence and its references. It mainly allowed us to have a metrics that was independent from any k-NN search but more related to the captions and human label linked with the images. As we had five captions for each images we first used it by taking one by one each five captions of the original image as candidate and compared it with the five captions of the neighbours image as references. This approach provided very similar results between each method so we then used the first five neighbours captions as reference and the original caption as candidate to compute the BLEU score. 
+		\\
+		\\
+		Note: Computing the BLEU score for such a large dataset was a relatively intensive computing task so we developed a shell script to parallelise the process on the different CPU core we had at hand. 
 		
 \section{Results}
-	\subsection{Bruteforce}
+The results gathered here represent all the different metrics described just above computed after applying the pipeline on our 118'000 images COCO dataset. In this section, we first describe the results individually for each k-NN method tested and finally discuss and compare the different method. Once again we consider two dataset here: RAW features and PCA features. The first one is a ˜118'000 rows and 512 columns matrix representing the feature extracted for each images (see pipeline) and the latter is the PCA reduction of this matrix (˜118'000 rows and 128 columns). 
+
+	\subsection{Brute-force}
+	
+	As the brute-force method was going to be our reference to compute other similarity metrics, this was the first method we implemented and computed. As explained in the k-NN method section we created this basic brute-force method ourself using some Pytorch optimised function that runs on the GPU. The computing time results are the one we can observe on Table \ref{table:benchmark-bruteforce}.
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ c | c | c |}
+			\cline{2-3}
+			& Dataset & Total Time \\ \cline{1-3}
+			\multicolumn{1}{ |c|  }{\multirow{2}{*}{k=2} } & RAW & 5min 33s  \\ \cline{2-3}
+			\multicolumn{1}{ |c|  }{} & PCA & 3min 31s  \\ \cline{1-3}
+			\multicolumn{1}{ |c|  }{\multirow{2}{*}{k=6} } & RAW & 6min 2s \\ \cline{2-3}
+			\multicolumn{1}{ |c|  }{} & PCA & 3min 38s \\ \cline{1-3}
+		\end{tabular}
+		\caption{Benchmark results of brute-force.}
+		\label{table:benchmark-bruteforce}
+	\end{table}
+	
+	We observe on Table \ref{table:benchmark-bruteforce}, that PCA dimensionality reduction had a good effect on computation time of our brute-force method reducing the total time to compute by more than 35\% in both case (k=2 and k=6) while we reduced the dimension from 512 to 128 (75\% decrease). We also notice that increasing k (the number of neighbours wanted) doesn't affect much the search time. Indeed as it is a brute-force search all the distance are computed and classified for each point in any case. Now we can compare the performance of our brute-force search between RAW and PCA with our different similarity metrics (Table \ref{table:sim-bruteforce}).
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ | c | c | c |}
+		\hline
+			Exact Similarity k = [1] & Exact Similarity k = [1:] & Permissive Similarity k = [0:] \\ \hline
+			69.14 \% & 15.74 \% & 74.65 \% \\ \hline
+			
+		\end{tabular}
+		\caption{Similarity between RAW and PCA dataset using Brute-force.}
+		\label{table:sim-bruteforce}
+	\end{table}
+	
+	On Table \ref{table:sim-bruteforce}, we observe the similarity scores using the usual similarity functions defined previously. The first column represent the similarity between each second neighbour (first neighbour if we exclude self), the second represent the first five neighbours and the last column represent all the six first neighbours including self. We can observe a quiet low strict similarity result on the five first neighbour however we clearly see through the Permissive Similarity score that most of the top five neighbours are the same (almost 75 \% in this case) so we can be confident that our PCA results are still pretty accurate while being much faster to compute. To confirm this assumption we will compute the BLEU Score on the caption of the neighbours and compare the result with and without PCA (see the description of the process in the Evaluation Metrics section). \\
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ | c | c |}
+		\hline
+			BLEU on RAW dataset & BLEU on PCA dataset \\ \hline
+			0.5418 & 0.5420 \\ \hline
+			
+		\end{tabular}
+		\caption{BLEU score on RAW and PCA dataset after using Brute-force.}
+		\label{table:bleu-bruteforce}
+	\end{table}
+
+As we can see on Figure \ref{table:bleu-bruteforce}, the difference between the two dataset is very small. We notice a slightly higher score for the PCA data. It confirms that using PCA reduced feature, not only reduce the computing time but also keep the same performance in image similarity detection or even slightly improves it. 
+\\
+
+ADD VISUAL CONFIRMATION (IMG) to confirm the result...
+
+
 	\subsection{Annoy}
+	The first approximate method we tried was Annoy. As described in the k-NN method section Annoy can only be run on CPU. During this project we tuned two parameters: \textit{n\_trees} and \textit{search\_k} (see k-NN method section for more details). \textit{n\_trees} influence only the build time while \textit{search\_k} influence only the search time. We present on Table \ref{table:benchmark-annoy-ntrees} and Y the computing time of Annoy on our datasets as the two parameters vary.
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ | c | c | c | c | c | c |}
+			\cline{1-6}
+			\multirow{2}{*}{dataset} & \multicolumn{5}{ |c|  }{n\_trees} \\ \cline{2-6}
+			& 1 & 4 & 16 & 32 & 64 \\ \cline{1-6}
+			RAW & 1.13 s & 4.55 s & 18.2 s & 13.6 s & 2 min 21 s\\ \cline{1-6}
+			PCA & 0.42 s & 1.78 s & 7.15 s & 13.9 s & 56.3 s \\ \cline{1-6}
+		\end{tabular}
+		\caption{Building time of Annoy index on the RAW and PCA dataset as n\_trees vary.}
+		\label{table:benchmark-annoy-ntrees}
+	\end{table}
+	
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ c | c | c | c | c | c |}
+			\cline{2-6}
+			& \multirow{2}{*}{dataset} & \multicolumn{4}{ |c|  }{search\_k} \\ \cline{3-6}
+			& & 2 & 8 & 32 & 64 \\ \cline{1-6}
+			\multicolumn{1}{|c|}{\multirow{2}{*}{k=2}} & RAW & 54.2 s & 55 s & 50s & 76s \\ \cline{2-6}
+			\multicolumn{1}{|c|}{} & PCA & 34s & 45s & 50s & 76s \\ \cline{1-6}
+			\multicolumn{1}{|c|}{\multirow{2}{*}{k=6}} & RAW & 34s & 45s & 50s & 76s \\ \cline{2-6}
+			\multicolumn{1}{|c|}{} & PCA & 34s & 45s & 50s & 76s \\ \cline{1-6}
+		\end{tabular}
+		\caption{Searching time of Annoy on the RAW and PCA dataset as search\_k vary.}
+		\label{table:benchmark-annoy-searchk}
+	\end{table}
+	 
+On Table \ref{table:benchmark-annoy-ntrees}, we observe that the relation between the building time and the number of trees is strictly linear. It is also important to note that there is a constant to add to this value (before building the index the dataset needs to be added to the library class) this constant depends solely on the size of the dataset it was about 500 ms for the PCA reduced dataset while around 2 seconds for the raw dataset (note the factor 4 between the 2 value is the same as the dimensionality reduction).
 	\subsection{NMSLIB}
 	\subsection{Faiss}
 
@@ -185,27 +272,9 @@ To assess the performance of the bruteforce k-NN search with Faiss, we computed 
 	\label{table:benchmark-faiss-bruteforce}
 \end{table}
 
-In this case, we observe for both dataset that the dominant factor is the search time or in other word the time to perform the query on each row of the dataset. We also observe that using the PCA reduced dataset lowered the time to compute by a factor of almost 3 (when we reduced the dimensionality from 512 to 128). It is also interesting to note that we don't observe significant increase in time when computing two or six nearest neighbours. Now to be able to say if the PCA reduced search was accurate enough it is interesting to compare the similarity between the matched neighbours with and without PCA reduction.
 
-\begin{table}[h]
-	\centering
-	\begin{tabular}{ | c | c | c |}
-	\hline
-		Exact Similarity k = [1] & Exact Similarity k = [1:] & Permissive Similarity k = [0:] \\ \hline
-		69.14 \% & 15.74 \% & 74.65 \% \\ \hline
-		
-	\end{tabular}
-	\caption{Similarity between RAW and PCA dataset using Faiss Bruteforce.}
-	\label{table:sim-faiss-bruteforce}
-\end{table}
+In this case, we observe for both dataset that the dominant factor is the search time or in other word the time to perform the query on each row of the dataset. We also observe that using the PCA reduced dataset lowered the time to compute by a factor of almost 3 (when we reduced the dimensionality from 512 to 128). It is also interesting to note again that we don't observe significant increase in time when computing two or six nearest neighbours. To confirm the effect of PCA on this brute-force search, we computed again the similarity between the dataset with and without PCA reduction. We observed the exact same result as in Table \ref{table:sim-bruteforce}. Which is very promising knowing that it took only a fraction of the time compute (1.8 seconds only when it was more than 5 minutes in our brute-force implementation).
 
-On Table \ref{table:sim-faiss-bruteforce}, we observe the similarity using the usual similarity functions defined previously. The first column represent the similarity between each second neighbour (first neighbour if we exclude self), the second represent the first five neighbours and the last column represent all the six first neighbours including self. We can observe a quiet low strict similarity result on the five first neighbour however we clearly see through the Permissive Similarity score that most of the top five neighbours are the same (almost 75 \% in this case) so we can be confident that our PCA score while being three time faster to compute is still pretty accurate. We can even confirm these results visually on Figure \ref{fig:visual-faiss}.
-
-\begin{figure}[h]
-	\includegraphics[width=\textwidth]{visual-faiss}
-	\caption{First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.}
-	\label{fig:visual-faiss}
-\end{figure}
 
 On Figure \ref{fig:visual-faiss}, we see that while some bruteforce PCA images are not identical to their raw bruteforce counterpart, they still have some similarities with the original picture. 
 
@@ -249,11 +318,22 @@ Next still using the Faiss library, we performed again on the full dataset their
 		32 & 15.51\% & 73.80\% & 15.25\% & 73.05\% & 15.00\% & 72.20\% & 14.65\% & 71.26\% \\
 		64 & 15.68\% & 74.42\% & 15.53\% & 74.12\% & 15.49\% & 73.75\% & 15.36\% & 73.30\% \\ \cline{1-9}
 	\end{tabular}
-	\caption{Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared raw features bruteforce search).}
+	\caption{Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to raw features bruteforce search).}
 	\label{table:benchmark-faiss}
 \end{table}
 
 On Table \ref{table:computation-time-faiss} and \ref{table:benchmark-faiss}, there is a few interesting things we can observe. First we see that there is no case in which the total time is less than 0.63 seconds (the time necessary to perform the bruteforce search). This result might appear as a deception, but it can be explained by the fact that building the index to perform the search takes significantly more time when using the approximate method. By looking further at the results we observe that eventhough the overall time is larger, performing only a search is several order of magnitude smaller (depending on the parameters) which could be really interesting for application that needs to query several time on the same indexed dataset. When changing the different parameters, we notice quiet obviously that increasing the number of nprobe (number of veronoi cells to check out of nlist) leads to an increase in search time and an improved similiraty score. Similarly increasing the number of cells (nlist) reduce the search time for a given nprobe (the search span is smaller) however it increases the index building time. \\
+
+
+All this results can be confirmed visually on Figure \ref{fig:visual-faiss}. We also notice that even-though there is only around 69\% match in exact similarity between first neighbours with PCA and RAW images, and even less with approximate method, the matched image seems to always be relevant. That is where the BLEU score will be of help to determine a score even when it doesn't perfectly represent a brute-force raw result. \\
+
+\begin{figure}[h]
+	\includegraphics[width=\textwidth]{visual-faiss}
+	\caption{First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.}
+	\label{fig:visual-faiss}
+\end{figure}
+
+BLEU SCORE \\
 
 To conclude on Faiss results, we observed that it is always a tradeoff between fast build time, fast search time and precision. When performing a single search an a whole dataset only once we would recommend using the bruteforce search which is overall faster and more accurate. However when performing several search on the same dataset it could be interesting to consider a fine tuned approximate search.
 
@@ -270,6 +350,7 @@ To conclude on Faiss results, we observed that it is always a tradeoff between f
 	which training set for our CNN for which kind of images.
 
 \begin{thebibliography}{5}
+
 \bibitem{large-scale-search} 
 Matthijs Douze, Hervé Jégou and Jeff Johnson. 2017.
 \textit{An evaluation of large-scale methods for image instance and class discovery}.
@@ -285,6 +366,12 @@ Yu. A. Malkov, D. A. Yashunin. 2017.
 \bibitem{faiss} 
 Jeff Johnson, Matthijs Douze, and Hervé Jégou. 2017.
 \textit{Billion-scale similarity search with GPUs}. 
+
+\bibitem{BLEU} 
+Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002.
+\textit{BLEU: a Method for Automatic Evaluation of Machine Translation}. 
+
+
 \end{thebibliography}
 
 \end{document}
