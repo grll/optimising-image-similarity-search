@@ -93,7 +93,7 @@ What we call in this project simply "Bruteforce" was our own implementation of a
 
 \subsubsection{NMSLIB}
 
-NMSLIB\footnote{\url{https://github.com/searchivarius/nmslib}} or Non-Metric Space Library (NMSLIB) is an efficient cross-platform similarity search library and a toolkit for evaluation of similarity search methods. It allows searching in generic metric and non-metric spaces. In our case we only focus on the euclidian space. Indeed we use a l2 norm to find similarity between extracted features. This is a good news as NMSLIB claims to have very good performance in the Euclidian domain as well. NMLSIB has been developed and optimised in C++ and also provide a Python API that we use in this project. The library propose many different similarity search methods with different performance in this project we will focus on one of the most promising one they provide: Hierarchical Navigable Small World graphs (also known as HNSW \cite{HNSW}). This approximate approach is fully graph-based, without any need for additional search structures and is able to strongly outperform many previous state-of-the-art vector-only approaches. NMSLIB has been written for CPU and as such we will make or computation on the CPU we have at hand when using HNSW the only parameter we will be able to tune will be the number of worker (number of threads used by the CPU).
+NMSLIB\footnote{\url{https://github.com/searchivarius/nmslib}} or Non-Metric Space Library (NMSLIB) is an efficient cross-platform similarity search library and a toolkit for evaluation of similarity search methods. It allows searching in generic metric and non-metric spaces. In our case we only focus on the euclidian space. Indeed we use a l2 norm to find similarity between extracted features. This is a good news as NMSLIB claims to have very good performance in the Euclidian domain as well. NMLSIB has been developed and optimised in C++ and also provide a Python API that we use in this project. The library propose many different similarity search methods with different performance in this project we will focus on one of the most promising one they provide: Hierarchical Navigable Small World graphs (also known as HNSW \cite{HNSW}). This approximate approach is fully graph-based, without any need for additional search structures and is able to strongly outperform many previous state-of-the-art vector-only approaches. NMSLIB has been written for CPU and as such we will make or computation on the CPU we have at hand. When using HNSW the only parameter we will be able to tune will be the number of worker (number of threads used by the CPU).
 
 \subsubsection{Faiss}
 \begin{itemize}
@@ -297,9 +297,123 @@ On Table \ref{table:benchmark-annoy-searchk}, we can again see the performance i
 	\label{table:benchmark-sim-annoy}
 \end{table}
 
-On table \ref{table:benchmark-sim-annoy}, we see the increase of performance as n\_trees and search\_k increase. Overall we see that a small increase in the number of node searched doesn't improve much the performance (it didn't affect the search time significantly as well) however a more significant increase definitely improves it. The important thing to note here is that when increasing one parameter while keeping the other one at the same value, we have an improvement in the performance. It means that the huge advantage of Annoy is that we can choose between long building time or long searching time against performance
+On table \ref{table:benchmark-sim-annoy}, we see the increase of performance as n\_trees and search\_k increase. Overall we see that a small increase in the number of node searched doesn't improve much the performance (it didn't affect the search time significantly as well) however a more significant increase definitely improves it. The important thing to note here is that when increasing one parameter while keeping the other one at the same value, we have an improvement in the performance. It means that a huge advantage of using Annoy is that we can choose between long building time or long searching time against performance by moving up and down this two parameters.
+
+Regarding the BLEU score we performed the usual analysis on the PCA dataset using n\_trees = 16 and search\_k increasing from 1 to 4096. If we look at the similarity results (Table \ref{table:benchmark-sim-annoy}), we see that the similiraty with brute-force PCA is low at low search\_k and very high at high search\_k. You see this result we obtained in Table \ref{table:bleu-annoy}
+
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ | c | c | c | c | c |}
+		\hline
+			search\_k & 1 & 64 & 512 & 4096 \\ \hline
+			BLEU score & 0.54588 & 0.54587 & 0.5430 & 0.5422 \\ \hline
+			
+		\end{tabular}
+		\caption{BLEU score on PCA dataset after performing Annoy with n\_trees = 16 and different value of search\_k.}
+		\label{table:bleu-annoy}
+	\end{table}
+	
+On Table \ref{table:bleu-annoy}, we observe first that the BLEU score is very similar between each iteration and that the value seems to slightly decrease as we increase the precision of the method. It is also worth noting that every value we had here were higher than the BLEU score obtain on the brute-force method. As we couldn't see a good correlation between our interpretation and the result of the BLEU score we decided to discard it for the rest of the project. \\
+
+
+ADD VISUALISATION (BLEU MATCH INDEX)
+
+To conclude about Annoy, after trying the different parameters we can say it is a very good option for CPU. The real advantage of this method is the possibility to control the build time and search time separately to lower or increase the precision. We got better results that our own implementation of a brute-force method even running on GPU. Now let's compare it with another CPU k-NN function using NMSLIB.
 
 	\subsection{NMSLIB}
+	
+As described in the pipeline section NMSLIB is a toolkit that offers many k-NN methods and evaluation possibilities. In this project, we tried only one of the most promising method that NMSLIB put at disposal: HSNW. \\
+
+As usual, we are first going to benchmark the computing time offered by the method and then its performance against our basic brute-force method. Similarly to Annoy analysis we will start by looking at the building time of the index generated by HSNW. And then the searching time to query the k nearest neighbors.
+
+The building time of HSNW for a given dataset is mainly determined by two parameters: M and efConstruction. M refers to the maximum numbers of connection that element can have per layer in the graph generated by HSNW, and efConstruction controls the recall of the greedy search used when building the graph. More information about these two parameters can be found in the paper \cite{HNSW}. We see the results building for different value of this parameter on both the raw and PCA dataset on Table \ref{table:benchmark-hsnw-build}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ c  l | c | c | c |}
+		\cline{3-5}
+		& & \multicolumn{3}{ |c|  }{ EfConstruct } \\ 
+		\cline{3-5}
+		& & 50 & 200 & 400 \\
+		\cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{RAW} } & M=6 & 5.40 s & 16.15 s & 26.60 s \\
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & M=24 &  9.82 s & 32.66 s & 56.92 s \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & M=48 & 9.85 s & 36.46s  & 1min 6.55 s\\ 
+		\cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{PCA} } & M=6 & 1.61 s & 4.23 s & 7.38 s\\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & M=24 & 2.42 s & 8.16 s & 15.44 s \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & M=48 & 2.52 s & 9.18 s & 18.42 s \\ 
+		\cline{1-5}
+	\end{tabular}
+	\caption{Building time of HSNW on both the RAW and PCA dataset.}
+	\label{table:benchmark-hsnw-build}
+\end{table}
+
+We observe on Table \ref{table:benchmark-hsnw-build} that both parameter increase leads to a building time increase. Again it is important to note that during build time a small constant of time dependending on the size of the dataset should be added to this value (arround 150ms for PCA and 50ms for the RAW dataset). We see that the influence of M on building time increase as EfConstruct increase. The increase in building time in both case should gives us better precision results. We are going to test that on our PCA features dataset in Table \ref{table:benchmark-hsnw-build-sim} with a constant search parameter.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ c  l | c | c | c |}
+		\cline{3-5}
+		& & \multicolumn{3}{ |c|  }{ EfConstruct } \\ 
+		\cline{3-5}
+		& & 50 & 200 & 400 \\
+		\cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{M=6} } & S.S. & 72.37\% & 82.65\% & 84.40\% \\
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & P.S. &  91.13\% & 94.96\% & 95.95\% \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & S.F. & 91.47\% & 95.62\%  & 96.33\% \\ 
+		\cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{M=24} } & S.S. & 93.51\% & 98.64\% & 99.05\% \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & P.S. & 98.48\% & 99.71\% & 99.80\% \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & S.F. & 99.02\% & 99.86\% & 99.92\% \\ 
+		\cline{1-5}
+		\multicolumn{1}{ |c|  }{\multirow{3}{*}{M=48} } & S.S. & 94.31\% & 99.15\% & 99.57\% \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & P.S. & 98.69\% & 99.82\% & 99.91\% \\ 
+		\cline{2-5}
+		\multicolumn{1}{ |c|  }{} & S.F. & 99.17\% & 99.89\% & 99.94\% \\ 
+		\cline{1-5}
+	\end{tabular}
+	\caption{Similarity of HSNW compared to brute-force on the PCA dataset. Search parameter Ef=50. S.S. represent the strict similarity with the five closest neighbors, P.S. represent the permissive similarity with the five closest neighbors and S.F. represent the strict similarity with the closest neighbor.}
+	\label{table:benchmark-hsnw-build-sim}
+\end{table}
+
+Fortunately, Table \ref{table:benchmark-hsnw-build-sim} validate our hypothesis and we see a clear increase in performance or similarity with a bruteforce PCA. We can also observe that the results are much higher than what we could observe in Annoy (even with high computation time). To be able to draw a full comparison let's have a look at the searching time and performance on Table X.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ c | c | c | c |}
+		\cline{2-4}
+		& \multicolumn{3}{ |c|  }{ ef } \\ 
+		\cline{2-4}
+		& 10 & 50 & 100 \\
+		\cline{1-4}
+		\multicolumn{1}{ |c|  }{ Searching Time } & 0.91 s & 2.14 s & 3.64 s \\
+		\cline{1-4}
+		\multicolumn{1}{ |c|  }{ Strict Similarity } & 87.74 \% & 98.34 \% & 99.17 \% \\
+		\cline{1-4}
+		\multicolumn{1}{ |c|  }{ Permissive Similarity } & 96.98 \% & 99.65 \% & 99.83 \% \\
+		\cline{1-4}
+		\multicolumn{1}{ |c|  }{ Strict Similarity (k=1) } & 99.07 \% & 99.73 \% & 99.78 \% \\
+		\cline{1-4}
+		
+	\end{tabular}
+	\caption{Similarity and Searching time of HSNW compared to brute-force on the PCA dataset with build parameters fixed at EfConstruct=200 and M=24.}
+	\label{table:benchmark-hsnw-search-sim}
+\end{table}
+
+On Table \ref{table:benchmark-hsnw-search-sim} we see the similarity as we tune the search parameter ef. ef allows us to determine how many connection to check in the graph. Increasing it, also increase the searching time but improve the performance. Overall the performance of HSNW is impressing. If we take M=24, efConstruct=200 and ef=50, we obtained almost 99\% on every similarity metrics in (8.16 + 2.14 = 10.2 seconds). When to obtain little lower results with Annoy it took more than 2 minutes. \\
+
+We didn't repeat here the analysis of the BLEU score as we obtain again very similar results. Being very close to the brute-force gives us enough evidence to say that HSNW is a very performant method with impressive results on CPU. HSNW like Annoy allows to tune searching time and building time to any specific needs while HSNW gives us better results faster.
+
 	\subsection{Faiss}
 
 \subsubsection{Bruteforce with Faiss}
@@ -358,22 +472,22 @@ Next still using the Faiss library, we performed again on the full dataset their
 		\multicolumn{1}{ |c|  }{\multirow{3}{*}{nprobe} } & \multicolumn{8}{ |c|  }{nlist} \\ \cline{2-9}
 		\multicolumn{1}{ |c|  }{} & \multicolumn{2}{ |c|  }{1024} & \multicolumn{2}{ |c|  }{2048} & \multicolumn{2}{ |c|  }{4096} & \multicolumn{2}{ |c|  }{8192} \\ \cline{2-9}
 		\multicolumn{1}{ |c|  }{} & S.S. & P.S. & S.S. & P.S. & S.S. & P.S. & S.S. & P.S. \\ \cline{1-9}
-		1 & 4.47\% & 37.56\% & 3.53\% & 33.52\% & 2.45\% & 29.48\% & 1.74\% & 26.46\% \\
-		2 & 8.08\% & 50.94\% & 6.52\% & 46.46\% & 5.23\% & 42.24\% & 4.18\% & 38.96\% \\
-		4 & 11.37\% & 61.61\% & 9.95\% & 57.72\% & 8.63\% & 53.94\% & 7.63\% & 50.85\% \\
-		8 & 13.76\% & 68.41\% & 12.89\% & 65.79\% & 11.83\% & 62.98\% & 10.86\% & 60.46\% \\
-		16 & 14.96\% & 72.05\% & 14.46\% & 70.54\% & 13.92\% & 68.91\% & 13.32\% & 67.23\% \\
-		32 & 15.51\% & 73.80\% & 15.25\% & 73.05\% & 15.00\% & 72.20\% & 14.65\% & 71.26\% \\
-		64 & 15.68\% & 74.42\% & 15.53\% & 74.12\% & 15.49\% & 73.75\% & 15.36\% & 73.30\% \\ \cline{1-9}
+		1 & 8.41\% & 41.52\% & 5.37\% & 36.37\% & 3.16\% & 31.71\% & 1.99\% & 28.26\% \\
+		2 & 20.19\% & 58.72\% & 13.46\% & 52.32\% & 8.83\% & 46.74\% & 5.91\% & 42.45\% \\
+		4 & 38.89\% & 74.41\% & 28.97\% & 68.09\% & 20.88\% & 62.19\% & 14.99\% & 57.36\% \\
+		8 & 59.91\% & 86.13\% & 49.03\% & 81.14\% & 39.04\% & 76.06\% & 30.55\% & 71.53\% \\
+		16 & 77.72\% & 93.53\% & 68.64\% & 90.20\% & 59.55\% & 86.68\% & 50.84\% & 83.21\% \\
+		32 & 90.06\% & 97.51\% & 83.65\% & 95.60\% & 76.95\% & 93.49\% & 70.30\% & 91.37\% \\
+		64 & 96.54\% & 99.23\% & 93.22\% & 98.39\% & 89.18\% & 97.31\% & 84.83\% & 96.13\% \\ \cline{1-9}
 	\end{tabular}
-	\caption{Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to raw features bruteforce search).}
+	\caption{Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to PCA features brute-force search).}
 	\label{table:benchmark-faiss}
 \end{table}
 
-On Table \ref{table:computation-time-faiss} and \ref{table:benchmark-faiss}, there is a few interesting things we can observe. First we see that there is no case in which the total time is less than 0.63 seconds (the time necessary to perform the bruteforce search). This result might appear as a deception, but it can be explained by the fact that building the index to perform the search takes significantly more time when using the approximate method. By looking further at the results we observe that eventhough the overall time is larger, performing only a search is several order of magnitude smaller (depending on the parameters) which could be really interesting for application that needs to query several time on the same indexed dataset. When changing the different parameters, we notice quiet obviously that increasing the number of nprobe (number of veronoi cells to check out of nlist) leads to an increase in search time and an improved similiraty score. Similarly increasing the number of cells (nlist) reduce the search time for a given nprobe (the search span is smaller) however it increases the index building time. \\
+On Table \ref{table:computation-time-faiss} and \ref{table:benchmark-faiss}, there is a few interesting things we can observe. First we see that there is no case in which the total time is less than 0.63 seconds (the time necessary to perform the bruteforce search). This result might appear as a deception, but it can be explained by the fact that building the index to perform the search takes significantly more time when using the approximate method. By looking further at the results we observe that eventhough the overall time is larger, performing only a search is several order of magnitude smaller (depending on the parameters) which could be really interesting for application that needs to query several time on the same indexed dataset. When changing the different parameters, we notice quiet obviously that increasing the number of nprobe (number of veronoi cells to check out of nlist) leads to an increase in search time and an improved similiraty score. Similarly increasing the number of cells (nlist) reduce the search time for a given nprobe (the search span is smaller) however it increases the index building time. It also good to notice that we obtain results above 99\% with nlist=1024 and nprobe=64 corresponding to a total (search + build) time of 1.81 seconds where HSNW took 10.81 seconds to achieve similar performance. \\
 
 
-All this results can be confirmed visually on Figure \ref{fig:visual-faiss}. We also notice that even-though there is only around 69\% match in exact similarity between first neighbours with PCA and RAW images, and even less with approximate method, the matched image seems to always be relevant. That is where the BLEU score will be of help to determine a score even when it doesn't perfectly represent a brute-force raw result. \\
+All this results can be confirmed visually on Figure \ref{fig:visual-faiss}. We also notice that even-though there is only around 69\% match in exact similarity between first neighbours with PCA and RAW images, and even less with approximate method, the matched image seems to always be relevant. \\
 
 \begin{figure}[h]
 	\includegraphics[width=\textwidth]{visual-faiss}
@@ -381,12 +495,12 @@ All this results can be confirmed visually on Figure \ref{fig:visual-faiss}. We 
 	\label{fig:visual-faiss}
 \end{figure}
 
-BLEU SCORE \\
+Once again we computed the BLEU score and got very similar results. The similarity comparison with brute-force shows enough evidence to evaluate the performance of the method. \\
 
-To conclude on Faiss results, we observed that it is always a tradeoff between fast build time, fast search time and precision. When performing a single search an a whole dataset only once we would recommend using the bruteforce search which is overall faster and more accurate. However when performing several search on the same dataset it could be interesting to consider a fine tuned approximate search.
+Finally observed that it is always a tradeoff between fast build time, fast search time and precision. When performing a single search an a whole dataset only once we would recommend using the brute-force search which is overall faster and more accurate. However when performing several search on the same dataset it could be interesting to consider a fine tuned approximate search.
 
-\subsection{Discussion on the results}
-	which method for which use case depending on the results, CPU method vs GPU method, training vs search...
+\subsection{Conclusion on the results}
+	To conclude on the results, we had the opportunity to compare here the performance and optimisation of 4 k-NN method. Two were computed on GPU (brute-force and Faiss) and two were computed on CPU (Annoy, NMSLIB). Our results showed that with the setup we had at hand, the GPU method: Faiss came first. For a one time usage it is most efficient to use the brute-force method proposed by Faiss. However if we need to query several time an already build index then the approximate method can bring better performance. In a CPU environment only, NMSLIB through HSNW showed some very good results and outperformed Annoy by far on our dataset. Annoy still seems to be a good solution as it still performed better than our unoptimised GPU brute-force implementation. It could also be a good choice for its simplicity.
 
 \section{Images subgroup analysis}
 	Why we do that? What difference between places365 and Imagenet. How did we proceed ? Which subgroup did we chose.
