@@ -504,16 +504,106 @@ Finally observed that it is always a tradeoff between fast build time, fast sear
 
 \section{Images subgroup analysis}
 	
-	During all this project and through all the report, every results we presented was obtained after extraction of the features using a resNet-18 CNN pretrained on Places365. But what if we used a different training dataset for our CNN ? How can the training dataset of our neural network influence our results and if it does how should we choose our training datasets ? This is what we will try to answer and show in this part. In order to do so we will first make general observations on the full dataset and in a second section we will focus on a specifc subgroup of the dataset to illustrate the results.
+	During all this project and through all the report, every results we presented was obtained after extraction of the features using a resNet-18 CNN pretrained on Places365. But what if we used a different training dataset for our CNN ? How can the training dataset of our neural network influence our results and if it does how should we choose our training datasets ? This is what we will try to answer and show in this part. In order to do so we will first make general observations on the full dataset. Then we will focus on a specifc subgroup of the dataset to illustrate the results.
 	 
 	\subsection{General comparison of the feature extracted}
 	
-	A first thing we did to be able to properly compare the results is that we extracted the features from our 118'000 images dataset from both resnet (one pretrained with imageNet and one pretrained with PLcaes365) then we performed our best k-NN method for a one time use. In this specific case we used Faiss brute-force. After that we compared the similarity and the BLEU SCORE given by faiss for the two different datasets.
+	A first thing we did to be able to properly compare the results is that we extracted the features from our 118'000 images dataset from both resnet (one pretrained with imageNet and one pretrained with PLcaes365) then we performed our best k-NN method for a one time use. In this specific case we used Faiss brute-force. After that we compared the similarity and the BLEU SCORE given by faiss for the two different datasets. This is the result we can observe on Table \ref{table:general-subgroups} and \ref{table:general-bleu-subgroups}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ c | c | c |}
+		\cline{2-3}
+		& \multicolumn{2}{ |c| }{ ImageNet vs Places365} \\
+		\cline{2-3}
+		& RAW & PCA \\
+		\cline{1-3}
+		\multicolumn{1}{ |c| }{ Strict Similarity } & 1.10\% & 0.87\% \\
+		\cline{1-3}
+		\multicolumn{1}{ |c| }{ Permissive Similarity } & 1.14\% & 0.97\% \\
+		\cline{1-3}
+		
+	\end{tabular}
+	\caption{Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (full dataset).}
+	\label{table:general-subgroups}
+\end{table}
 	
-	\subsection{}
-	\subsection{Conclusion}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ | c | c | c | c |}
+		\cline{1-4}
+		\multicolumn{2}{ |c| }{ ImageNet } & \multicolumn{2}{ |c| }{ Places365 } \\
+		\cline{1-4}
+		RAW & PCA & RAW & PCA \\
+		\cline{1-4}
+		0.5725 & 0.5729 & 0.5418 & 0.5420 \\
+		\cline{1-4}	
+	\end{tabular}
+	\caption{BlEU Score obtained after different pretraining on the full dataset.}
+	\label{table:general-bleu-subgroups}
+\end{table}
+
+
+Table \ref{table:general-subgroups} shows us that the difference obtained with a different training set is striking. For the first neighbor we got arround only 1\% strict similarity which very small compared to what we could observe before. This sustain our hypothesis according which the pre-training dataset is an important factor in our image similarity pipeline. The BLEU score displayed on Table \ref{table:general-bleu-subgroups} is in this case more useful than the BLEU score we obtained before in this study. Indeed we notice in both case a small increase from RAW extracted feature to PCA reduced features but also a more significant change when changing the training dataset of our CNN. ImageNet seems to perform better than Places365 in this case. However we must be careful as ImageNet is a library of zoom object images with categories and Places365 a library of scenes object with scene attributes. This difference is important as in the COCO dataset (evaluation dataset) people labeled the images with what they saw and it may be more easy for them to described object than the scene arround the object. Hence the BLEU score might also be biased just by some objects appearing in the picture. To see more visually what is going on we are going to have a closer look at a specific subset of data in the next part.
+
+	\subsection{Traffic Light subset}
 	
-	which training set for our CNN for which kind of images.
+We chose to study in more details the traffic light subset for a few reasons. First reason is that we were able to extract a sufficient number of data from the COCO dataset by filtering every caption containing "traffic light" (1366 images). The second reason is that "traffic light" is one of ImageNet category meaning that ImageNet should perform very well at recognizing traffic light. Lastly, traffic light are usually not far from a scene such as a road, some buildings, a street mostly outdoors that Places365 was mainly trained for. For all these reasons we expect to see very different results from the different pretrained dataset with the CNN trained on ImageNet matching mostly the "traffic light" while the one trained on Places365 matching mostly the background from the scene. This result can be observe on Figure \ref{fig:visual-subgroup}.
+
+\begin{figure}[h]
+	\includegraphics[width=\textwidth]{visual-subgroup}
+	\caption{First neighbour of a traffic light image with pretraining on ImageNet and on Places365.}
+	\label{fig:visual-subgroup}
+\end{figure}
+
+On Figure \ref{fig:visual-subgroup}, we observe that the background of the scene with the shape of the buildings and the bricks seems to be matched with Places365 while the "traffic light" itself is matched with ImageNet.
+
+
+We also computed similarity and BLEU score on this subset to confirm that it matched with the general case depicted above. We obtained the results described in Table \ref{table:general-tl} and \ref{table:general-bleu-tl}.
+
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ c | c | c |}
+		\cline{2-3}
+		& \multicolumn{2}{ |c| }{ ImageNet vs Places365} \\
+		\cline{2-3}
+		& RAW & PCA \\
+		\cline{1-3}
+		\multicolumn{1}{ |c| }{ Strict Similarity } & 1.32\% & 1.10\% \\
+		\cline{1-3}
+		\multicolumn{1}{ |c| }{ Permissive Similarity } & 1.58\% & 1.54\% \\
+		\cline{1-3}
+		
+	\end{tabular}
+	\caption{Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (Traffic Light subset).}
+	\label{table:general-tl}
+\end{table}
+	
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ | c | c | c | c |}
+		\cline{1-4}
+		\multicolumn{2}{ |c| }{ ImageNet } & \multicolumn{2}{ |c| }{ Places365 } \\
+		\cline{1-4}
+		RAW & PCA & RAW & PCA \\
+		\cline{1-4}
+		0.5845 & 0.5865 & 0.5684 & 0.5706 \\
+		\cline{1-4}	
+	\end{tabular}
+	\caption{BLEU Score obtained after different pretraining on the Traffic Light subset.}
+	\label{table:general-bleu-tl}
+\end{table}
+
+We can observe on Table \ref{table:general-tl} and \ref{table:general-bleu-tl} very similar results as the one observed in the general case. Arround 1\% similarity between the matched neighbors and slightly higher BLEU score for ImageNet with PCA features always slightly above.
+
+	\subsection{Which training set to choose?}
+	
+To conclude this part about pre-training set for image similarity through CNN feature extraction, there is two main idea to take away. First we realised that the choice of pre-training set has a huge impact on the quality of our matching hence it is a determinant factor to take into consideration. The second is that the pre-training set chosen should depend on the matching wished to obtain every pre-training set will have its pros and cons in our case Places365 was very good at matching the scene and backgrounds of our dataset while ImageNet seems to be better at matching standalone objects present on the images. 
+
+\section*{Conclusion}
+
+In this project we were able to implement a pipeline to evaluate different state of the art k-NN methods and perform similarity search between images at large scale. We put in place different metrics to provide measure and numbers to our analysis. Through this practical approach we learned a lot about the main concepts and ideas behind the methods used. This study helps determine which methods and parameters are more suitable for which use case given certain conditions such as hardware set up, datasets, and results wanted. 
 
 \begin{thebibliography}{5}
 
