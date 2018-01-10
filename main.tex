@@ -503,10 +503,14 @@ Finally observed that it is always a tradeoff between fast build time, fast sear
 	To conclude on the results, we had the opportunity to compare here the performance and optimisation of 4 k-NN method. Two were computed on GPU (brute-force and Faiss) and two were computed on CPU (Annoy, NMSLIB). Our results showed that with the setup we had at hand, the GPU method: Faiss came first. For a one time usage it is most efficient to use the brute-force method proposed by Faiss. However if we need to query several time an already build index then the approximate method can bring better performance. In a CPU environment only, NMSLIB through HSNW showed some very good results and outperformed Annoy by far on our dataset. Annoy still seems to be a good solution as it still performed better than our unoptimised GPU brute-force implementation. It could also be a good choice for its simplicity.
 
 \section{Images subgroup analysis}
-	Why we do that? What difference between places365 and Imagenet. How did we proceed ? Which subgroup did we chose.
 	
-	\subsection{Results with places365}
-	\subsection{Results with Imagenet}
+	During all this project and through all the report, every results we presented was obtained after extraction of the features using a resNet-18 CNN pretrained on Places365. But what if we used a different training dataset for our CNN ? How can the training dataset of our neural network influence our results and if it does how should we choose our training datasets ? This is what we will try to answer and show in this part. In order to do so we will first make general observations on the full dataset and in a second section we will focus on a specifc subgroup of the dataset to illustrate the results.
+	 
+	\subsection{General comparison of the feature extracted}
+	
+	A first thing we did to be able to properly compare the results is that we extracted the features from our 118'000 images dataset from both resnet (one pretrained with imageNet and one pretrained with PLcaes365) then we performed our best k-NN method for a one time use. In this specific case we used Faiss brute-force. After that we compared the similarity and the BLEU SCORE given by faiss for the two different datasets.
+	
+	\subsection{}
 	\subsection{Conclusion}
 	
 	which training set for our CNN for which kind of images.
