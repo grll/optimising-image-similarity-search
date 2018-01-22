@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.10.4)  10 JAN 2018 22:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.10.4)  11 JAN 2018 17:52
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -873,157 +873,208 @@ Package pdftex.def Info: epfl.png used on input line 30.
  [1
 
 {/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./epfl.png>] [2]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 71.
- (/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
+Overfull \hbox (3.00055pt too wide) in paragraph at lines 58--59
+\OT1/cmr/m/n/10 To eval-u-ate dif-fer-ent meth-ods to de-tect sim-i-lar-i-ties, we fol-lowed a spe-cific pipeline
+ []
+
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 69.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 71.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 69.
  [3]
-Underfull \hbox (badness 10000) in paragraph at lines 85--86
+Underfull \hbox (badness 10000) in paragraph at lines 83--84
 
  []
 
-[4] [5] [6] <imagenet-img.png, id=193, 467.7475pt x 278.03876pt>
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 100--101
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 104--105
+
+ []
+
+[5] [6] <imagenet-img.png, id=194, 467.7475pt x 278.03876pt>
 File: imagenet-img.png Graphic file (type png)
  <use imagenet-img.png>
-Package pdftex.def Info: imagenet-img.png used on input line 131.
+Package pdftex.def Info: imagenet-img.png used on input line 134.
 (pdftex.def)             Requested size: 110.39886pt x 85.35957pt.
- <places-img.jpg, id=194, 1354.05875pt x 903.375pt>
+ <places-img.jpg, id=195, 1354.05875pt x 903.375pt>
 File: places-img.jpg Graphic file (type jpg)
  <use places-img.jpg>
-Package pdftex.def Info: places-img.jpg used on input line 137.
+Package pdftex.def Info: places-img.jpg used on input line 140.
 (pdftex.def)             Requested size: 110.39304pt x 85.35284pt.
- <coco-img.jpg, id=195, 501.875pt x 363.3575pt>
+ <coco-img.jpg, id=196, 501.875pt x 363.3575pt>
 File: coco-img.jpg Graphic file (type jpg)
  <use coco-img.jpg>
-Package pdftex.def Info: coco-img.jpg used on input line 143.
+Package pdftex.def Info: coco-img.jpg used on input line 146.
 (pdftex.def)             Requested size: 110.39752pt x 85.35574pt.
- [7 <./imagenet-img.png (PNG copy)> <./places-img.jpg> <./coco-img.jpg>]
-Underfull \hbox (badness 10000) in paragraph at lines 162--166
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--164
+
+ []
+
+[7 <./imagenet-img.png (PNG copy)> <./places-img.jpg> <./coco-img.jpg>]
+Underfull \hbox (badness 10000) in paragraph at lines 168--172
 
  []
 
 [8]
-Overfull \hbox (32.75076pt too wide) in paragraph at lines 192--198
+Overfull \hbox (30.86185pt too wide) in paragraph at lines 198--204
  [][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--203
+Underfull \hbox (badness 10000) in paragraph at lines 208--209
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 216--218
+Underfull \hbox (badness 10000) in paragraph at lines 222--223
 
  []
 
+[9] <visual-bruteforce.png, id=224, 432.61626pt x 810.02625pt>
+File: visual-bruteforce.png Graphic file (type png)
+ <use visual-bruteforce.png>
+Package pdftex.def Info: visual-bruteforce.png used on input line 227.
+(pdftex.def)             Requested size: 345.0pt x 645.99484pt.
+
+
+LaTeX Warning: Float too large for page by 81.99484pt on input line 230.
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
-
-[9]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 316--317
-
- []
 
 [10]
-Underfull \hbox (badness 10000) in paragraph at lines 325--326
+Underfull \hbox (badness 10000) in paragraph at lines 327--328
 
  []
 
 [11]
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
+
+ []
+
+<visual-annoy.png, id=248, 767.86874pt x 855.195pt>
+File: visual-annoy.png Graphic file (type png)
+ <use visual-annoy.png>
+Package pdftex.def Info: visual-annoy.png used on input line 333.
+(pdftex.def)             Requested size: 345.0pt x 384.23393pt.
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 413--414
+Underfull \hbox (badness 10000) in paragraph at lines 342--343
 
  []
 
-[12] [13]
-Overfull \hbox (8.08377pt too wide) in paragraph at lines 449--463
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 430--431
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 432--433
+
+ []
+
+[13] <visual-nmslib.png, id=270, 694.595pt x 768.8725pt>
+File: visual-nmslib.png Graphic file (type png)
+ <use visual-nmslib.png>
+Package pdftex.def Info: visual-nmslib.png used on input line 437.
+(pdftex.def)             Requested size: 345.0pt x 381.90118pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Overfull \hbox (8.08377pt too wide) in paragraph at lines 473--487
  [][] 
  []
 
 
-Overfull \hbox (42.19528pt too wide) in paragraph at lines 470--483
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Overfull \hbox (42.19528pt too wide) in paragraph at lines 494--507
  [][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 487--488
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 511--512
 
  []
 
 [14]
-Underfull \hbox (badness 10000) in paragraph at lines 490--491
+Underfull \hbox (badness 10000) in paragraph at lines 513--514
 
  []
 
-<visual-faiss.png, id=270, 966.61125pt x 1073.00874pt>
+[15] <visual-faiss.png, id=294, 966.61125pt x 1073.00874pt>
 File: visual-faiss.png Graphic file (type png)
  <use visual-faiss.png>
-Package pdftex.def Info: visual-faiss.png used on input line 493.
+Package pdftex.def Info: visual-faiss.png used on input line 516.
 (pdftex.def)             Requested size: 345.0pt x 382.97556pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 498--499
+Underfull \hbox (badness 10000) in paragraph at lines 521--522
 
  []
 
-[15]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[16 <./visual-faiss.png>] <visual-subgroup.png, id=288, 566.115pt x 190.7125pt>
+[16] <visual-subgroup.png, id=306, 566.115pt x 190.7125pt>
 File: visual-subgroup.png Graphic file (type png)
  <use visual-subgroup.png>
-Package pdftex.def Info: visual-subgroup.png used on input line 554.
+Package pdftex.def Info: visual-subgroup.png used on input line 577.
 (pdftex.def)             Requested size: 345.0pt x 116.22678pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[17] [18 <./visual-subgroup.png>] [19]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 633.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 633.
+[17] [18] [19]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 656.
+ [20 <./visual-bruteforce.png>] [21 <./visual-annoy.png>] [22 <./visual-nmslib.png>] [23 <./visual-faiss.png> <./visual-subgroup.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 656.
  (/Users/guillaume/Desktop/semester-project/.texpadtmp/main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 633.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 633.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 656.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 656.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: <no file>.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 633.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 656.
  ) 
 Here is how much of TeX's memory you used:
- 18337 strings out of 492995
- 339152 string characters out of 6132704
- 434271 words of memory out of 5000000
- 21478 multiletter control sequences out of 15000+600000
+ 18363 strings out of 492995
+ 339629 string characters out of 6132704
+ 433816 words of memory out of 5000000
+ 21493 multiletter control sequences out of 15000+600000
  10797 words of font info for 39 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 62i,12n,92p,1392b,549s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 62i,12n,92p,1478b,549s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on /Users/guillaume/Desktop/semester-project/.texpadtmp/main.pdf (19 pages, 3278054 bytes).
+Output written on /Users/guillaume/Desktop/semester-project/.texpadtmp/main.pdf (23 pages, 12114129 bytes).
 PDF statistics:
- 371 PDF objects out of 1000 (max. 8388607)
- 326 compressed objects within 4 object streams
- 87 named destinations out of 1000 (max. 500000)
- 259 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 410 PDF objects out of 1000 (max. 8388607)
+ 355 compressed objects within 4 object streams
+ 95 named destinations out of 1000 (max. 500000)
+ 274 words of extra memory for PDF output out of 10000 (max. 10000000)
 

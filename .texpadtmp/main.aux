@@ -23,18 +23,17 @@
 \citation{large-scale-search}
 \citation{resnet}
 \citation{large-scale-search}
-\citation{large-scale-search}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Pipeline}{3}{section.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Feature Extraction}{3}{subsection.1.1}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Dimensionality Reduction (PCA)}{3}{subsection.1.2}}
 \citation{HNSW}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.3}k-NN methods}{4}{subsection.1.3}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Bruteforce}{4}{subsubsection.1.3.1}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Brute-force}{4}{subsubsection.1.3.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.2}Annoy}{4}{subsubsection.1.3.2}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.3}NMSLIB}{4}{subsubsection.1.3.3}}
 \citation{faiss}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.3}NMSLIB}{5}{subsubsection.1.3.3}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.4}Faiss}{5}{subsubsection.1.3.4}}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Experimental Setup}{5}{section.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Experimental Setup}{6}{section.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Datasets}{6}{subsection.2.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}ImageNet and Places365 for feature extraction}{6}{subsubsection.2.1.1}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2}MSCoCo for evaluation}{6}{subsubsection.2.1.2}}
@@ -51,57 +50,63 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Bleu Score}{8}{subsubsection.2.2.2}}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Results}{8}{section.3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Brute-force}{8}{subsection.3.1}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Benchmark results of brute-force.\relax }}{8}{table.caption.9}}
-\newlabel{table:benchmark-bruteforce}{{1}{8}{Benchmark results of brute-force.\relax }{table.caption.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Similarity between RAW and PCA dataset using Brute-force.\relax }}{9}{table.caption.10}}
-\newlabel{table:sim-bruteforce}{{2}{9}{Similarity between RAW and PCA dataset using Brute-force.\relax }{table.caption.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Computation time of our own brute-force method on the whole dataset.\relax }}{9}{table.caption.9}}
+\newlabel{table:benchmark-bruteforce}{{1}{9}{Computation time of our own brute-force method on the whole dataset.\relax }{table.caption.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Similarity between RAW and PCA dataset using Brute-force. k = [1] represents the first neighbor, k=[1:] represents the five first neighbors, k=[0:] represents the six first neighbors including self.\relax }}{9}{table.caption.10}}
+\newlabel{table:sim-bruteforce}{{2}{9}{Similarity between RAW and PCA dataset using Brute-force. k = [1] represents the first neighbor, k=[1:] represents the five first neighbors, k=[0:] represents the six first neighbors including self.\relax }{table.caption.10}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces BLEU score on RAW and PCA dataset after using Brute-force.\relax }}{9}{table.caption.11}}
 \newlabel{table:bleu-bruteforce}{{3}{9}{BLEU score on RAW and PCA dataset after using Brute-force.\relax }{table.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Annoy}{9}{subsection.3.2}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Building time of Annoy index on the RAW and PCA dataset as n\_trees vary.\relax }}{10}{table.caption.12}}
-\newlabel{table:benchmark-annoy-ntrees}{{4}{10}{Building time of Annoy index on the RAW and PCA dataset as n\_trees vary.\relax }{table.caption.12}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Searching time of Annoy on the RAW and PCA dataset as search\_k vary.\relax }}{10}{table.caption.13}}
-\newlabel{table:benchmark-annoy-searchk}{{5}{10}{Searching time of Annoy on the RAW and PCA dataset as search\_k vary.\relax }{table.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Annoy}{10}{subsection.3.2}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Building time of Annoy index on the RAW and PCA dataset as n\_trees vary.\relax }}{10}{table.caption.13}}
+\newlabel{table:benchmark-annoy-ntrees}{{4}{10}{Building time of Annoy index on the RAW and PCA dataset as n\_trees vary.\relax }{table.caption.13}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Searching time of Annoy on the RAW and PCA dataset as search\_k vary.\relax }}{10}{table.caption.14}}
+\newlabel{table:benchmark-annoy-searchk}{{5}{10}{Searching time of Annoy on the RAW and PCA dataset as search\_k vary.\relax }{table.caption.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Similarity Score results for Annoy on the PCA dataset compared with PCA brute-force results. (S.S. represent strict similarity between the five nearest neighbors excluding self, P.S. represent the permissive similarity between the five nearest neighbors excluding self, and S.F. represent the strict similarity between the first neighbors.)\relax }}{11}{table.caption.15}}
+\newlabel{table:benchmark-sim-annoy}{{6}{11}{Similarity Score results for Annoy on the PCA dataset compared with PCA brute-force results. (S.S. represent strict similarity between the five nearest neighbors excluding self, P.S. represent the permissive similarity between the five nearest neighbors excluding self, and S.F. represent the strict similarity between the first neighbors.)\relax }{table.caption.15}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces BLEU score on PCA dataset after performing Annoy with n\_trees = 16 and different value of search\_k.\relax }}{11}{table.caption.16}}
+\newlabel{table:bleu-annoy}{{7}{11}{BLEU score on PCA dataset after performing Annoy with n\_trees = 16 and different value of search\_k.\relax }{table.caption.16}{}}
 \citation{HNSW}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Similarity Score results for Annoy on the PCA dataset compared with PCA brute-force results. (S.S. represent strict similarity between the five nearest neighbour excluding self, P.S. represent the permissive similarity between the five nearest neighbours excluding self, and S.F. represent the strict similarity between the first neighbours.)\relax }}{11}{table.caption.14}}
-\newlabel{table:benchmark-sim-annoy}{{6}{11}{Similarity Score results for Annoy on the PCA dataset compared with PCA brute-force results. (S.S. represent strict similarity between the five nearest neighbour excluding self, P.S. represent the permissive similarity between the five nearest neighbours excluding self, and S.F. represent the strict similarity between the first neighbours.)\relax }{table.caption.14}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces BLEU score on PCA dataset after performing Annoy with n\_trees = 16 and different value of search\_k.\relax }}{11}{table.caption.15}}
-\newlabel{table:bleu-annoy}{{7}{11}{BLEU score on PCA dataset after performing Annoy with n\_trees = 16 and different value of search\_k.\relax }{table.caption.15}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}NMSLIB}{11}{subsection.3.3}}
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Building time of HSNW on both the RAW and PCA dataset.\relax }}{12}{table.caption.16}}
-\newlabel{table:benchmark-hsnw-build}{{8}{12}{Building time of HSNW on both the RAW and PCA dataset.\relax }{table.caption.16}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Similarity of HSNW compared to brute-force on the PCA dataset. Search parameter Ef=50. S.S. represent the strict similarity with the five closest neighbors, P.S. represent the permissive similarity with the five closest neighbors and S.F. represent the strict similarity with the closest neighbor.\relax }}{12}{table.caption.17}}
-\newlabel{table:benchmark-hsnw-build-sim}{{9}{12}{Similarity of HSNW compared to brute-force on the PCA dataset. Search parameter Ef=50. S.S. represent the strict similarity with the five closest neighbors, P.S. represent the permissive similarity with the five closest neighbors and S.F. represent the strict similarity with the closest neighbor.\relax }{table.caption.17}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Similarity and Searching time of HSNW compared to brute-force on the PCA dataset with build parameters fixed at EfConstruct=200 and M=24.\relax }}{13}{table.caption.18}}
-\newlabel{table:benchmark-hsnw-search-sim}{{10}{13}{Similarity and Searching time of HSNW compared to brute-force on the PCA dataset with build parameters fixed at EfConstruct=200 and M=24.\relax }{table.caption.18}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Faiss}{13}{subsection.3.4}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.1}Bruteforce with Faiss}{13}{subsubsection.3.4.1}}
-\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Benchmark results of Faiss Bruteforce.\relax }}{13}{table.caption.19}}
-\newlabel{table:benchmark-faiss-bruteforce}{{11}{13}{Benchmark results of Faiss Bruteforce.\relax }{table.caption.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}NMSLIB}{12}{subsection.3.3}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Building time of HSNW on both the RAW and PCA dataset.\relax }}{12}{table.caption.18}}
+\newlabel{table:benchmark-hsnw-build}{{8}{12}{Building time of HSNW on both the RAW and PCA dataset.\relax }{table.caption.18}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Similarity of HSNW compared to brute-force on the PCA dataset. Search parameter Ef=50. S.S. represent the strict similarity with the five closest neighbors, P.S. represent the permissive similarity with the five closest neighbors and S.F. represent the strict similarity with the closest neighbor.\relax }}{13}{table.caption.19}}
+\newlabel{table:benchmark-hsnw-build-sim}{{9}{13}{Similarity of HSNW compared to brute-force on the PCA dataset. Search parameter Ef=50. S.S. represent the strict similarity with the five closest neighbors, P.S. represent the permissive similarity with the five closest neighbors and S.F. represent the strict similarity with the closest neighbor.\relax }{table.caption.19}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Similarity and Searching time of HSNW compared to brute-force on the PCA dataset with build parameters fixed at EfConstruct=200 and M=24.\relax }}{13}{table.caption.20}}
+\newlabel{table:benchmark-hsnw-search-sim}{{10}{13}{Similarity and Searching time of HSNW compared to brute-force on the PCA dataset with build parameters fixed at EfConstruct=200 and M=24.\relax }{table.caption.20}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Faiss}{14}{subsection.3.4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.1}Bruteforce with Faiss}{14}{subsubsection.3.4.1}}
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Computation time of Faiss Bruteforce on the whole dataset.\relax }}{14}{table.caption.22}}
+\newlabel{table:benchmark-faiss-bruteforce}{{11}{14}{Computation time of Faiss Bruteforce on the whole dataset.\relax }{table.caption.22}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.4.2}Approximate Search}{14}{subsubsection.3.4.2}}
-\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Computation time of Faiss approximate method on the PCA features with k=6. (Search represent the search time (query time) and Total the sum of the search time and index building time.\relax }}{14}{table.caption.20}}
-\newlabel{table:computation-time-faiss}{{12}{14}{Computation time of Faiss approximate method on the PCA features with k=6. (Search represent the search time (query time) and Total the sum of the search time and index building time.\relax }{table.caption.20}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to PCA features brute-force search).\relax }}{14}{table.caption.21}}
-\newlabel{table:benchmark-faiss}{{13}{14}{Benchmark results of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to PCA features brute-force search).\relax }{table.caption.21}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Conclusion on the results}{15}{subsection.3.5}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Images subgroup analysis}{15}{section.4}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.\relax }}{16}{figure.caption.22}}
-\newlabel{fig:visual-faiss}{{2}{16}{First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.\relax }{figure.caption.22}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}General comparison of the feature extracted}{16}{subsection.4.1}}
-\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (full dataset).\relax }}{17}{table.caption.23}}
-\newlabel{table:general-subgroups}{{14}{17}{Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (full dataset).\relax }{table.caption.23}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces BlEU Score obtained after different pretraining on the full dataset.\relax }}{17}{table.caption.24}}
-\newlabel{table:general-bleu-subgroups}{{15}{17}{BlEU Score obtained after different pretraining on the full dataset.\relax }{table.caption.24}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Computation time of Faiss approximate method on the PCA features with k=6. (Search represent the search time (query time) and Total the sum of the search time and index building time.\relax }}{15}{table.caption.23}}
+\newlabel{table:computation-time-faiss}{{12}{15}{Computation time of Faiss approximate method on the PCA features with k=6. (Search represent the search time (query time) and Total the sum of the search time and index building time.\relax }{table.caption.23}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Similarity score of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to PCA features brute-force search).\relax }}{15}{table.caption.24}}
+\newlabel{table:benchmark-faiss}{{13}{15}{Similarity score of Faiss approximate method on the PCA features with k=6. (S.S. represent the Strict Similarity and P.S. represent the Permissive Similarity compared to PCA features brute-force search).\relax }{table.caption.24}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Conclusion on the results}{16}{subsection.3.5}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Training set analysis}{16}{section.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}General comparison of the features extracted}{16}{subsection.4.1}}
+\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (full dataset).\relax }}{17}{table.caption.26}}
+\newlabel{table:general-subgroups}{{14}{17}{Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (full dataset).\relax }{table.caption.26}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces BlEU Score obtained after different pretraining on the full dataset.\relax }}{17}{table.caption.27}}
+\newlabel{table:general-bleu-subgroups}{{15}{17}{BlEU Score obtained after different pretraining on the full dataset.\relax }{table.caption.27}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Traffic Light subset}{17}{subsection.4.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces First neighbour of a traffic light image with pretraining on ImageNet and on Places365.\relax }}{18}{figure.caption.25}}
-\newlabel{fig:visual-subgroup}{{3}{18}{First neighbour of a traffic light image with pretraining on ImageNet and on Places365.\relax }{figure.caption.25}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {16}{\ignorespaces Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (Traffic Light subset).\relax }}{18}{table.caption.26}}
-\newlabel{table:general-tl}{{16}{18}{Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (Traffic Light subset).\relax }{table.caption.26}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {17}{\ignorespaces BLEU Score obtained after different pretraining on the Traffic Light subset.\relax }}{18}{table.caption.27}}
-\newlabel{table:general-bleu-tl}{{17}{18}{BLEU Score obtained after different pretraining on the Traffic Light subset.\relax }{table.caption.27}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Which training set to choose?}{18}{subsection.4.3}}
 \bibcite{large-scale-search}{1}
 \bibcite{resnet}{2}
+\@writefile{lot}{\contentsline {table}{\numberline {16}{\ignorespaces Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (Traffic Light subset).\relax }}{18}{table.caption.29}}
+\newlabel{table:general-tl}{{16}{18}{Strict Similarity averaged of the first neighbors and Permissive Similarity on the five first neighbors given by pretraining on ImageNet compared to Places365 (Traffic Light subset).\relax }{table.caption.29}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {17}{\ignorespaces BLEU Score obtained after different pretraining on the Traffic Light subset.\relax }}{18}{table.caption.30}}
+\newlabel{table:general-bleu-tl}{{17}{18}{BLEU Score obtained after different pretraining on the Traffic Light subset.\relax }{table.caption.30}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Which training set to choose?}{18}{subsection.4.3}}
 \bibcite{HNSW}{3}
 \bibcite{faiss}{4}
 \bibcite{BLEU}{5}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces First neighbor of some images using brute-force on raw and PCA features.\relax }}{20}{figure.caption.12}}
+\newlabel{fig:visual-bruteforce}{{2}{20}{First neighbor of some images using brute-force on raw and PCA features.\relax }{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces First neighbor of some images using Annoy on raw and PCA features with different parameters.\relax }}{21}{figure.caption.17}}
+\newlabel{fig:visual-annoy}{{3}{21}{First neighbor of some images using Annoy on raw and PCA features with different parameters.\relax }{figure.caption.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces First neighbor of some images using NMSLIB on the PCA features with different parameters.\relax }}{22}{figure.caption.21}}
+\newlabel{fig:visual-nmslib}{{4}{22}{First neighbor of some images using NMSLIB on the PCA features with different parameters.\relax }{figure.caption.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.\relax }}{23}{figure.caption.25}}
+\newlabel{fig:visual-faiss}{{5}{23}{First neighbour of some images using bruteforce and approximate faiss methods on raw and PCA features.\relax }{figure.caption.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces First neighbour of a traffic light image with pretraining on ImageNet and on Places365.\relax }}{23}{figure.caption.28}}
+\newlabel{fig:visual-subgroup}{{6}{23}{First neighbour of a traffic light image with pretraining on ImageNet and on Places365.\relax }{figure.caption.28}{}}

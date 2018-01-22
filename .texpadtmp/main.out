@@ -2,7 +2,7 @@
 \BOOKMARK [2][-]{subsection.1.1}{Feature Extraction}{section.1}% 2
 \BOOKMARK [2][-]{subsection.1.2}{Dimensionality Reduction \(PCA\)}{section.1}% 3
 \BOOKMARK [2][-]{subsection.1.3}{k-NN methods}{section.1}% 4
-\BOOKMARK [3][-]{subsubsection.1.3.1}{Bruteforce}{subsection.1.3}% 5
+\BOOKMARK [3][-]{subsubsection.1.3.1}{Brute-force}{subsection.1.3}% 5
 \BOOKMARK [3][-]{subsubsection.1.3.2}{Annoy}{subsection.1.3}% 6
 \BOOKMARK [3][-]{subsubsection.1.3.3}{NMSLIB}{subsection.1.3}% 7
 \BOOKMARK [3][-]{subsubsection.1.3.4}{Faiss}{subsection.1.3}% 8
@@ -21,7 +21,7 @@
 \BOOKMARK [3][-]{subsubsection.3.4.1}{Bruteforce with Faiss}{subsection.3.4}% 21
 \BOOKMARK [3][-]{subsubsection.3.4.2}{Approximate Search}{subsection.3.4}% 22
 \BOOKMARK [2][-]{subsection.3.5}{Conclusion on the results}{section.3}% 23
-\BOOKMARK [1][-]{section.4}{Images subgroup analysis}{}% 24
-\BOOKMARK [2][-]{subsection.4.1}{General comparison of the feature extracted}{section.4}% 25
+\BOOKMARK [1][-]{section.4}{Training set analysis}{}% 24
+\BOOKMARK [2][-]{subsection.4.1}{General comparison of the features extracted}{section.4}% 25
 \BOOKMARK [2][-]{subsection.4.2}{Traffic Light subset}{section.4}% 26
 \BOOKMARK [2][-]{subsection.4.3}{Which training set to choose?}{section.4}% 27
